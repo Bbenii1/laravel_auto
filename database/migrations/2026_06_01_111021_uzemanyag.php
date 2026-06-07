@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,12 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('marka');
-        Schema::create('marka', function (Blueprint $table) {
+        Schema::dropIfExists('uzemanyag');
+        Schema::create('uzemanyag', function (Blueprint $table) {
             $table->id();
-            $table->string('nev');
-            $table->unsignedBigInteger('orszagID');
+            $table->string('nev')->unique();
         });
+
+        DB::table('uzemanyag')->insert([
+            ['nev' => 'dízel'],
+            ['nev' => 'benzin'],
+            ['nev' => 'elektromos'],
+        ]);
     }
 
     /**
@@ -24,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('marka');
+        Schema::dropIfExists('uzemanyag');
     }
 };

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrszagModel;
-use App\Models\OrszagModell;
 use Illuminate\Http\Request;
 
 class OrszagController extends Controller
@@ -13,7 +12,8 @@ class OrszagController extends Controller
      */
     public function index()
     {
-        return view('orszag.index');
+        $orszag = OrszagModel::all();
+        return view('orszag.index', compact('orszag'));
     }
 
     /**
@@ -31,10 +31,12 @@ class OrszagController extends Controller
     {
         $request->validate([
             'nev' => 'required',
+            'rovid_nev' => 'required|string',
         ]);
 
         $orszag = new OrszagModel();
         $orszag->nev = $request->nev;
+        $orszag->rovid_nev = $request->rovid_nev;
         $orszag->timestamps = false;
         $orszag->save();
 
@@ -46,7 +48,8 @@ class OrszagController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $orszag = OrszagModel::findOrFail($id);
+        return view('orszag.show', compact('orszag'));
     }
 
     /**
@@ -54,7 +57,8 @@ class OrszagController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $orszag = OrszagModel::findOrFail($id);
+        return view('orszag.edit', compact('orszag'));
     }
 
     /**
@@ -62,7 +66,15 @@ class OrszagController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nev' => 'required',
+            'rovid_nev' => 'required|string',
+        ]);
+
+        $orszag = OrszagModel::findOrFail($id);
+        $orszag->update($request->only(['nev', 'rovid_nev']));
+
+        return redirect()->route('orszag.index')->with('success', 'Ország sikeresen módosítva.');
     }
 
     /**
@@ -70,6 +82,9 @@ class OrszagController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $orszag = OrszagModel::findOrFail($id);
+        $orszag->delete();
+
+        return redirect()->route('orszag.index')->with('success', 'Ország sikeresen törölve.');
     }
 }

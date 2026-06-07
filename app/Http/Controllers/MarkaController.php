@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MarkaModel;
+use App\Models\OrszagModel;
 use Illuminate\Http\Request;
 
 class MarkaController extends Controller
@@ -12,7 +13,8 @@ class MarkaController extends Controller
      */
     public function index()
     {
-        return view('marka.index');
+        $marka = MarkaModel::with('orszag')->get();
+        return view('marka.index', compact('marka'));
     }
 
     /**
@@ -20,7 +22,8 @@ class MarkaController extends Controller
      */
     public function create()
     {
-        return view('marka.create');
+        $orszag = OrszagModel::all();
+        return view('marka.create', compact('orszag'));
     }
 
     /**
@@ -30,7 +33,7 @@ class MarkaController extends Controller
     {
         $request->validate([
             'nev' => 'required',
-            'orszagID' => 'required|integer',
+            'orszagID' => 'required|exists:orszag,id',
         ]);
 
         $marka = new MarkaModel();
@@ -47,7 +50,8 @@ class MarkaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $marka = MarkaModel::with('orszag')->findOrFail($id);
+        return view('marka.show', compact('marka'));
     }
 
     /**
@@ -55,7 +59,9 @@ class MarkaController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $marka = MarkaModel::findOrFail($id);
+        $orszag = OrszagModel::all();
+        return view('marka.edit', compact('marka', 'orszag'));
     }
 
     /**
@@ -63,7 +69,15 @@ class MarkaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nev' => 'required',
+            'orszagID' => 'required|exists:orszag,id',
+        ]);
+
+        $marka = MarkaModel::findOrFail($id);
+        $marka->update($request->only(['nev', 'orszagID']));
+
+        return redirect()->route('marka.index')->with('success', 'Márka sikeresen módosítva.');
     }
 
     /**
@@ -71,6 +85,9 @@ class MarkaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $marka = MarkaModel::findOrFail($id);
+        $marka->delete();
+
+        return redirect()->route('marka.index')->with('success', 'Márka sikeresen törölve.');
     }
 }
