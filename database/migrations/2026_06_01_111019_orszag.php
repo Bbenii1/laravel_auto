@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('orszag', function (Blueprint $table) {
             $table->id();
             $table->string('nev');
+            $table->string("rovid_nev");
         });
     }
 
